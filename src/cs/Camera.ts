@@ -37,9 +37,9 @@ class Camera {
     this.angleY = this.angleY + dx;
     this.angleX = this.angleX - dy;
   
-    if (this.angleX > 89) this.angleX = 89;
-    if (this.angleX < -89) {
-      this.angleX = -89;
+    if (this.angleX > 80) this.angleX = 80;
+    if (this.angleX < -80) {
+      this.angleX = -80;
     }
     this.updateCameraVector();
   };

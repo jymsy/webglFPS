@@ -1,6 +1,6 @@
 import { OBJDoc, DrawingInfo } from "./OBJParse";
 import Camera from "./Camera";
-import { Matrix4 } from "../utils/cuon-matrix";
+import { Matrix4, Vector3 } from "../utils/cuon-matrix";
 import { createProgram } from "../utils/cuon-utils";
 
 const vshaderSource = `
@@ -45,6 +45,7 @@ class Gun {
   a_Position: number = -1;
   a_Color: number = -1;
   a_Normal: number = -1;
+  isAiming = false;
 
   constructor(gl: WebGLRenderingContext, fileName: string) {
     this.vertexBuffer = gl.createBuffer();
@@ -95,11 +96,24 @@ class Gun {
   update() {
     const cameraPosition = Camera.position;
     // move gun to the right position
-    const movement = Camera.front.scale(0.1);
+    const front = new Vector3([
+      Camera.front.elements[0],
+      Camera.front.elements[1],
+      Camera.front.elements[2],
+    ]).normalize();
+    const movement = front.scale(0.15);
     let startPosition = cameraPosition.add(movement);
     // startPosition = startPosition.sub(Camera.up.scale(0.2));
-    // startPosition = startPosition.add(Camera.right.scale(0.03));
+    // startPosition = startPosition.add(Camera.right.scale(0.02));
 
+    if (this.isAiming) {
+      const right = new Vector3([
+        Camera.right.elements[0],
+        Camera.right.elements[1],
+        Camera.right.elements[2],
+      ]).normalize();
+      startPosition = startPosition.sub(right.scale(0.02));
+    }
     this.u_ModelMatrix?.setTranslate(
       startPosition.elements[0],
       startPosition.elements[1],
@@ -120,6 +134,10 @@ class Gun {
     );
 
     this.u_ModelMatrix?.translate(0, -0.2, 0);
+  }
+
+  setAiming(aiming: boolean) {
+    this.isAiming = aiming;
   }
 
   tick(gl: WebGLRenderingContext, g_MvpMatrix: Matrix4) {

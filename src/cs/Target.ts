@@ -81,7 +81,6 @@ class Target {
     this.tick(gl);
     const pixels = new Uint8Array(4);
     gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    console.log(pixels);
     gl.uniform1i(GSSL.u_Clicked, 0);
     return pixels[0] === 255;
   }

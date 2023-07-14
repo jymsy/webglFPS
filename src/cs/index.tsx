@@ -7,7 +7,7 @@ import Target from "./Target";
 import GLSL from "./GLSL";
 import Wall from "./Wall";
 import Bullet from "./Bullet";
-import Gun from './Gun';
+import Gun from "./Gun";
 import "./style.css";
 
 export default function App() {
@@ -38,7 +38,8 @@ export default function App() {
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
     target: Target,
-    bullet: Bullet
+    bullet: Bullet,
+    gun: Gun
   ) => {
     canvas.onmousemove = (ev) => {
       if (document.pointerLockElement) {
@@ -48,11 +49,25 @@ export default function App() {
 
     canvas.addEventListener("click", () => {
       canvas.requestPointerLock();
+    });
 
-      if (document.pointerLockElement) {
-        gl.useProgram(GLSL.program);
-        target.isHit(gl, canvas.width / 2, canvas.height / 2);
-        bullet.fire();
+    canvas.addEventListener("mousedown", (ev: MouseEvent) => {
+      // left mouse button
+      if (ev.button === 0) {
+        if (document.pointerLockElement) {
+          gl.useProgram(GLSL.program);
+          target.isHit(gl, canvas.width / 2, canvas.height / 2);
+          bullet.fire();
+        }
+      } else if (ev.button === 2 && document.pointerLockElement) {
+        gun.setAiming(true);
+      }
+    });
+
+    canvas.addEventListener("mouseup", (ev: MouseEvent) => {
+      // right mouse button up
+      if (ev.button === 2 && document.pointerLockElement) {
+        gun.setAiming(false);
       }
     });
 
@@ -141,7 +156,7 @@ export default function App() {
     const bullet = new Bullet(gl);
     const gun = new Gun(gl, "gun.obj");
 
-    initEventHandlers(canvas, gl, target, bullet);
+    initEventHandlers(canvas, gl, target, bullet, gun);
 
     const viewProjMatrix = new Matrix4();
     const finalMatrix = new Matrix4();
