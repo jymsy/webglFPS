@@ -57,12 +57,15 @@ class Gun {
     if (!this.program) {
       return;
     }
-    this.a_Position = gl.getAttribLocation(this.program, 'a_Position');
-    this.a_Normal = gl.getAttribLocation(this.program, 'a_Normal');
-    this.a_Color = gl.getAttribLocation(this.program, 'a_Color');
-    this.u_MvpMatrix = gl.getUniformLocation(this.program, 'u_MvpMatrix');
-    this.u_NormalMatrix = gl.getUniformLocation(this.program, 'u_NormalMatrix');
-    this.u_ModelMatrixLocation = gl.getUniformLocation(this.program, 'u_modelMatrix');
+    this.a_Position = gl.getAttribLocation(this.program, "a_Position");
+    this.a_Normal = gl.getAttribLocation(this.program, "a_Normal");
+    this.a_Color = gl.getAttribLocation(this.program, "a_Color");
+    this.u_MvpMatrix = gl.getUniformLocation(this.program, "u_MvpMatrix");
+    this.u_NormalMatrix = gl.getUniformLocation(this.program, "u_NormalMatrix");
+    this.u_ModelMatrixLocation = gl.getUniformLocation(
+      this.program,
+      "u_modelMatrix"
+    );
 
     this.load(fileName);
   }
@@ -94,37 +97,41 @@ class Gun {
     // move gun to the right position
     const movement = Camera.front.scale(0.1);
     let startPosition = cameraPosition.add(movement);
-    startPosition = startPosition.sub(Camera.up.scale(0.2));
-    startPosition = startPosition.add(Camera.right.scale(0.03));
+    // startPosition = startPosition.sub(Camera.up.scale(0.2));
+    // startPosition = startPosition.add(Camera.right.scale(0.03));
+
 
     this.u_ModelMatrix?.setTranslate(
       startPosition.elements[0],
       startPosition.elements[1],
       startPosition.elements[2]
     );
+
     this.u_ModelMatrix?.rotate(
-      -90 - Camera.angleY,
-      Camera.up.elements[0],
-      Camera.up.elements[1],
-      Camera.up.elements[2]
-    );
-    console.log(Camera.position.elements[0], Camera.position.elements[1], Camera.position.elements[2]);
+      -90-Camera.angleY,
+     Camera.up.elements[0],
+     Camera.up.elements[1],
+     Camera.up.elements[2]
+   );
     this.u_ModelMatrix?.rotate(
       Camera.angleX,
       Camera.right.elements[0],
       Camera.right.elements[1],
       Camera.right.elements[2]
     );
+    // console.log(startPosition.elements[0], startPosition.elements[1], startPosition.elements[2]);
+    this.u_ModelMatrix?.translate(0, -0.2, 0);
   }
 
   tick(gl: WebGLRenderingContext, g_MvpMatrix: Matrix4) {
-    gl.useProgram(this.program);
     if (this.objDoc != null && this.objDoc.isMTLComplete()) {
       // OBJ and all MTLs are available
       this.drawInfo = this.objDoc!.getDrawingInfo();
       this.objDoc = null;
     }
     if (!this.drawInfo) return;
+
+    gl.useProgram(this.program);
 
     // Write date into the buffer object
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -143,11 +150,19 @@ class Gun {
     gl.enableVertexAttribArray(this.a_Normal);
 
     gl.uniformMatrix4fv(this.u_MvpMatrix, false, g_MvpMatrix.elements);
-    gl.uniformMatrix4fv(this.u_ModelMatrixLocation, false, this.u_ModelMatrix!.elements);
+    gl.uniformMatrix4fv(
+      this.u_ModelMatrixLocation,
+      false,
+      this.u_ModelMatrix!.elements
+    );
 
     this.g_normalMatrix!.setInverseOf(this.u_ModelMatrix!);
     this.g_normalMatrix!.transpose();
-  gl.uniformMatrix4fv(this.u_NormalMatrix, false, this.g_normalMatrix!.elements);
+    gl.uniformMatrix4fv(
+      this.u_NormalMatrix,
+      false,
+      this.g_normalMatrix!.elements
+    );
 
     // Write the indices to the buffer object
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);

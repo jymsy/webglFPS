@@ -38,7 +38,7 @@ export default function App() {
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
     target: Target,
-    bullet: Bullet,
+    bullet: Bullet
   ) => {
     canvas.onmousemove = (ev) => {
       if (document.pointerLockElement) {
@@ -48,8 +48,9 @@ export default function App() {
 
     canvas.addEventListener("click", () => {
       canvas.requestPointerLock();
-      
+
       if (document.pointerLockElement) {
+        gl.useProgram(GLSL.program);
         target.isHit(gl, canvas.width / 2, canvas.height / 2);
         bullet.fire();
       }
@@ -138,7 +139,7 @@ export default function App() {
     const floor = new Wall(gl, floorVertex);
     const target = new Target(gl, 0.5, 0.4);
     const bullet = new Bullet(gl);
-    const gun = new Gun(gl, 'gun.obj');
+    const gun = new Gun(gl, "gun.obj");
 
     initEventHandlers(canvas, gl, target, bullet);
 
@@ -147,7 +148,7 @@ export default function App() {
     viewProjMatrix.setPerspective(
       50.0,
       canvas.width / canvas.height,
-      0.1,
+      0.05,
       10.0
     );
 
