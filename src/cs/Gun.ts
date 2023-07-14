@@ -100,7 +100,6 @@ class Gun {
     // startPosition = startPosition.sub(Camera.up.scale(0.2));
     // startPosition = startPosition.add(Camera.right.scale(0.03));
 
-
     this.u_ModelMatrix?.setTranslate(
       startPosition.elements[0],
       startPosition.elements[1],
@@ -108,18 +107,18 @@ class Gun {
     );
 
     this.u_ModelMatrix?.rotate(
-      -90-Camera.angleY,
-     Camera.up.elements[0],
-     Camera.up.elements[1],
-     Camera.up.elements[2]
-   );
+      -90 - Camera.angleY,
+      Camera.up.elements[0],
+      Camera.up.elements[1],
+      Camera.up.elements[2]
+    );
     this.u_ModelMatrix?.rotate(
       Camera.angleX,
       Camera.right.elements[0],
       Camera.right.elements[1],
       Camera.right.elements[2]
     );
-    // console.log(startPosition.elements[0], startPosition.elements[1], startPosition.elements[2]);
+
     this.u_ModelMatrix?.translate(0, -0.2, 0);
   }
 
@@ -133,6 +132,7 @@ class Gun {
 
     gl.useProgram(this.program);
 
+    this.update();
     // Write date into the buffer object
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, this.drawInfo.vertices, gl.STATIC_DRAW);
@@ -171,8 +171,6 @@ class Gun {
       this.drawInfo.indices,
       gl.STATIC_DRAW
     );
-
-    this.update();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     // Draw
