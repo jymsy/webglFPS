@@ -38,7 +38,7 @@ export default function App() {
     canvas: HTMLCanvasElement,
     gl: WebGLRenderingContext,
     target: Target,
-    bullet: Bullet,
+    // bullet: Bullet,
     gun: Gun
   ) => {
     canvas.onmousemove = (ev) => {
@@ -57,7 +57,7 @@ export default function App() {
         if (document.pointerLockElement) {
           gl.useProgram(GLSL.program);
           target.isHit(gl, canvas.width / 2, canvas.height / 2);
-          bullet.fire();
+          // bullet.fire();
         }
       } else if (ev.button === 2 && document.pointerLockElement) {
         gun.setAiming(true);
@@ -153,10 +153,10 @@ export default function App() {
     const rightWall = new Wall(gl, rightVertex);
     const floor = new Wall(gl, floorVertex);
     const target = new Target(gl, 0.5, 0.4);
-    const bullet = new Bullet(gl);
+    // const bullet = new Bullet(gl);
     const gun = new Gun(gl, "gun.obj");
 
-    initEventHandlers(canvas, gl, target, bullet, gun);
+    initEventHandlers(canvas, gl, target, gun);
 
     const viewProjMatrix = new Matrix4();
     const finalMatrix = new Matrix4();
@@ -194,7 +194,7 @@ export default function App() {
 
         target.tick(gl);
 
-        bullet.tick(gl);
+        // bullet.tick(gl);
         gun.tick(gl, g_MvpMatrix);
 
         requestAnimationFrame(tick);

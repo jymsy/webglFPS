@@ -101,9 +101,14 @@ class Gun {
       Camera.front.elements[1],
       Camera.front.elements[2],
     ]).normalize();
+    const up = new Vector3([
+      Camera.up.elements[0],
+      Camera.up.elements[1],
+      Camera.up.elements[2],
+    ]).normalize();
     const movement = front.scale(0.15);
     let startPosition = cameraPosition.add(movement);
-    // startPosition = startPosition.sub(Camera.up.scale(0.2));
+    startPosition = startPosition.sub(up.scale(0.2));
     // startPosition = startPosition.add(Camera.right.scale(0.02));
 
     if (this.isAiming) {
@@ -133,7 +138,7 @@ class Gun {
       Camera.right.elements[2]
     );
 
-    this.u_ModelMatrix?.translate(0, -0.2, 0);
+    // this.u_ModelMatrix?.translate(0, -0.2, 0);
   }
 
   setAiming(aiming: boolean) {
