@@ -46,6 +46,7 @@ class Gun {
   a_Color: number = -1;
   a_Normal: number = -1;
   isAiming = false;
+  step = 0.01;
 
   constructor(gl: WebGLRenderingContext, fileName: string) {
     this.vertexBuffer = gl.createBuffer();
@@ -107,9 +108,9 @@ class Gun {
       Camera.up.elements[2],
     ]).normalize();
     const movement = front.scale(0.15);
-    let startPosition = cameraPosition.add(movement);
-    startPosition = startPosition.sub(up.scale(0.2));
-    // startPosition = startPosition.add(Camera.right.scale(0.02));
+    let gunPosition = cameraPosition.add(movement);
+    gunPosition = gunPosition.sub(up.scale(0.2));
+    // gunPosition = gunPosition.add(Camera.right.scale(0.02));
 
     if (this.isAiming) {
       const right = new Vector3([
@@ -117,12 +118,14 @@ class Gun {
         Camera.right.elements[1],
         Camera.right.elements[2],
       ]).normalize();
-      startPosition = startPosition.sub(right.scale(0.02));
+      gunPosition = gunPosition.sub(right.scale(0.02));
+      console.log(gunPosition.elements[0]);
     }
+
     this.u_ModelMatrix?.setTranslate(
-      startPosition.elements[0],
-      startPosition.elements[1],
-      startPosition.elements[2]
+      gunPosition.elements[0],
+      gunPosition.elements[1],
+      gunPosition.elements[2]
     );
 
     this.u_ModelMatrix?.rotate(
