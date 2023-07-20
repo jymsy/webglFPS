@@ -46,10 +46,9 @@ class Gun {
   a_Color: number = -1;
   a_Normal: number = -1;
   isAiming = false;
-  step = 0.01;
-  startPosition = new Vector3([0, 0, 0]);
-  endPosition = new Vector3([0, 0, 0]);
-  currentX: number = -1;
+  step = 0.002;
+  aimEnd = false;
+  currentX: number = 0;
 
   constructor(gl: WebGLRenderingContext, fileName: string) {
     this.vertexBuffer = gl.createBuffer();
@@ -73,48 +72,22 @@ class Gun {
     );
 
     this.load(fileName);
-    this.calculateAimingPath();
   }
 
-  calculateAimingPath() {
-    const cameraPosition = Camera.position;
-    const front = new Vector3([
-      Camera.front.elements[0],
-      Camera.front.elements[1],
-      Camera.front.elements[2],
-    ]).normalize();
-    const up = new Vector3([
-      Camera.up.elements[0],
-      Camera.up.elements[1],
-      Camera.up.elements[2],
-    ]).normalize();
-
-    const movement = front.scale(0.15);
-    const startPosition = cameraPosition.add(movement);
-    this.startPosition = startPosition.sub(up.scale(0.2));
-    this.currentX = startPosition.elements[0];
-
-    const right = new Vector3([
-      Camera.right.elements[0],
-      Camera.right.elements[1],
-      Camera.right.elements[2],
-    ]).normalize();
-    this.endPosition = startPosition.sub(right.scale(0.02));
+  getVector(positionA: Vector3, positionB: Vector3): Vector3 {
+    return new Vector3([
+      positionB.elements[0] - positionA.elements[0],
+      positionB.elements[1] - positionA.elements[1],
+      positionB.elements[2] - positionA.elements[2],
+    ]);
   }
 
-  getAimPosition(x: number) {
-    const ret =
-      x -
-      this.startPosition.elements[0] / this.endPosition.elements[0] -
-      this.startPosition.elements[0];
-
-    const y =
-      ret * (this.endPosition.elements[1] - this.startPosition.elements[1]) +
-      this.startPosition.elements[1];
-    const z =
-      ret * (this.endPosition.elements[2] - this.startPosition.elements[2]) +
-      this.startPosition.elements[2];
-    return new Vector3([x, y, z]);
+  distance(positionA: Vector3, positionB: Vector3): number {
+    return Math.sqrt(
+      Math.pow(positionA.elements[0] - positionB.elements[0], 2) +
+        Math.pow(positionA.elements[1] - positionB.elements[1], 2) +
+        Math.pow(positionA.elements[2] - positionB.elements[2], 2)
+    );
   }
 
   load(fileName: string) {
@@ -159,15 +132,29 @@ class Gun {
     // gunPosition = gunPosition.add(Camera.right.scale(0.02));
 
     if (this.isAiming) {
-      // const right = new Vector3([
-      //   Camera.right.elements[0],
-      //   Camera.right.elements[1],
-      //   Camera.right.elements[2],
-      // ]).normalize();
-      // gunPosition = gunPosition.sub(right.scale(0.02));
-      // console.log(gunPosition.elements[0]);
-      
-      // gunPosition = this.getAimPosition(this.currentX);
+      this.currentX += this.step;
+      const right = new Vector3([
+        Camera.right.elements[0],
+        Camera.right.elements[1],
+        Camera.right.elements[2],
+      ]).normalize();
+      const endPosition = gunPosition.sub(right.scale(0.02));
+      if (this.aimEnd) {
+        gunPosition = endPosition;
+      } else {
+        const aimVector = this.getVector(gunPosition, endPosition);
+        gunPosition = gunPosition.add(
+          aimVector.normalize().scale(this.currentX)
+        );
+        if (this.distance(endPosition, gunPosition) < this.step) {
+          gunPosition = endPosition;
+          this.aimEnd = true;
+        }
+      }
+    } else if (this.currentX) {
+      // mouse up
+      this.currentX = 0;
+      this.aimEnd = false;
     }
 
     this.u_ModelMatrix?.setTranslate(
@@ -188,8 +175,6 @@ class Gun {
       Camera.right.elements[1],
       Camera.right.elements[2]
     );
-
-    // this.u_ModelMatrix?.translate(0, -0.2, 0);
   }
 
   setAiming(aiming: boolean) {
