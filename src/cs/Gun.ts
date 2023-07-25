@@ -1,5 +1,6 @@
 import { OBJDoc, DrawingInfo } from "./OBJParse";
 import Camera from "./Camera";
+import { fetchFile } from "../utils";
 import { Matrix4, Vector3 } from "../utils/cuon-matrix";
 import { createProgram } from "../utils/cuon-utils";
 
@@ -71,7 +72,7 @@ class Gun {
       "u_modelMatrix"
     );
 
-    this.load(fileName);
+    fetchFile(fileName, this.onReadOBJFile);
   }
 
   getVector(positionA: Vector3, positionB: Vector3): Vector3 {
@@ -90,17 +91,17 @@ class Gun {
     );
   }
 
-  load(fileName: string) {
-    var request = new XMLHttpRequest();
+  // load(fileName: string) {
+  //   var request = new XMLHttpRequest();
 
-    request.onreadystatechange = () => {
-      if (request.readyState === 4 && request.status !== 404) {
-        this.onReadOBJFile(request.responseText, fileName);
-      }
-    };
-    request.open("GET", fileName, true);
-    request.send();
-  }
+  //   request.onreadystatechange = () => {
+  //     if (request.readyState === 4 && request.status !== 404) {
+  //       this.onReadOBJFile(request.responseText, fileName);
+  //     }
+  //   };
+  //   request.open("GET", fileName, true);
+  //   request.send();
+  // }
 
   onReadOBJFile(fileString: string, fileName: string) {
     var objDoc = new OBJDoc(fileName); // Create a OBJDoc object
