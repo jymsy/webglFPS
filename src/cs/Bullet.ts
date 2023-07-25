@@ -71,7 +71,7 @@ class Bullet {
     gl.enableVertexAttribArray(GSSL.a_Position);
 
     gl.vertexAttrib4f(GSSL.a_Color, 1, 1, 1, 1);
-    gl.uniform1i(GSSL.u_hasTexCoord, 0);
+    gl.uniform1i(GSSL.u_fragType, 0.0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 

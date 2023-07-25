@@ -103,7 +103,7 @@ class Gun {
   //   request.send();
   // }
 
-  onReadOBJFile(fileString: string, fileName: string) {
+  onReadOBJFile = (fileString: string, fileName: string) => {
     var objDoc = new OBJDoc(fileName); // Create a OBJDoc object
     var result = objDoc.parse(fileString, 0.05, true); // Parse the file
     if (!result) {
@@ -111,7 +111,7 @@ class Gun {
       return;
     }
     this.objDoc = objDoc;
-  }
+  };
 
   update() {
     let gunPosition = new Vector3([0, 0, 0]);

@@ -56,9 +56,9 @@ class Target {
     gl.enableVertexAttribArray(GSSL.a_Position);
 
     gl.vertexAttrib4f(GSSL.a_Color, 1, 1, 1, 1);
-    gl.uniform1i(GSSL.u_hasTexCoord, 0);
+    gl.uniform1i(GSSL.u_fragType, 0.0);
     if (loadTexture) {
-      gl.uniform1i(GSSL.u_hasTexCoord, 1);
+      gl.uniform1i(GSSL.u_fragType, 1.0);
 
       gl.vertexAttribPointer(
         GSSL.a_TexCoord,

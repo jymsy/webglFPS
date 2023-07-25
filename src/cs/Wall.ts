@@ -1,4 +1,4 @@
-import GSSL from "./GLSL";
+import GLSL from "./GLSL";
 
 class Wall {
   vertices: Float32Array;
@@ -22,26 +22,40 @@ class Wall {
 
     if (loadTexture) {
       // 将缓冲区对象分配给a_Position
-      gl.vertexAttribPointer(GSSL.a_Position, 3, gl.FLOAT, false, this.fsize * 5, 0);
+      gl.vertexAttribPointer(
+        GLSL.a_Position,
+        3,
+        gl.FLOAT,
+        false,
+        this.fsize * 5,
+        0
+      );
     } else {
-      gl.vertexAttribPointer(GSSL.a_Position, 3, gl.FLOAT, false, this.fsize * 3, 0);
+      gl.vertexAttribPointer(
+        GLSL.a_Position,
+        3,
+        gl.FLOAT,
+        false,
+        this.fsize * 3,
+        0
+      );
     }
     // 连接变量与缓冲区对象
-    gl.enableVertexAttribArray(GSSL.a_Position);
+    gl.enableVertexAttribArray(GLSL.a_Position);
 
-    gl.uniform1i(GSSL.u_hasTexCoord, 0);
+    gl.uniform1i(GLSL.u_fragType, 0.0);
     if (loadTexture) {
-      gl.uniform1i(GSSL.u_hasTexCoord, 1);
+      gl.uniform1i(GLSL.u_fragType, 1.0);
 
       gl.vertexAttribPointer(
-        GSSL.a_TexCoord,
+        GLSL.a_TexCoord,
         2,
         gl.FLOAT,
         false,
         this.fsize * 5,
         this.fsize * 3
       );
-      gl.enableVertexAttribArray(GSSL.a_TexCoord);
+      gl.enableVertexAttribArray(GLSL.a_TexCoord);
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 

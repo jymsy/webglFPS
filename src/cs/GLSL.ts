@@ -2,29 +2,23 @@ import { createProgram } from "../utils/cuon-utils";
 
 // 顶点着色器(计算顶点的位置)
 const vshaderSource = `
+precision mediump int;
     attribute vec4 a_Position;
     attribute vec4 a_Color;
       uniform mat4 u_MvpMatrix;
       attribute vec2 a_TexCoord;
       attribute vec3 a_TexCoordCube;
-      uniform bool u_hasTexCoord;
-      uniform bool u_hasTexCoordCube;
+      uniform int u_fragType; //0 none, 1 2d, 2 cube
       uniform bool u_Clicked;
-      varying vec2 v_TexCoord;
-      varying vec3 v_TexCoordCube;
+      varying vec3 v_TexCoord;
       varying vec4 v_Color;
 
       void main() {
         gl_Position = u_MvpMatrix * a_Position;
-        if (u_hasTexCoordCube) {
-          v_TexCoordCube = a_TexCoordCube;
-        } else {
-          v_TexCoordCube = vec3(-1.0, -1.0, -1.0);
-        }
-        if (u_hasTexCoord) {
-          v_TexCoord = a_TexCoord;
-        } else {
-          v_TexCoord = vec2(-1.0, -1.0);
+        if (u_fragType == 1) {
+          v_TexCoord = vec3(a_TexCoord, 1.0);
+        } else if (u_fragType == 2) {
+          v_TexCoord = a_TexCoordCube;
         }
         if (u_Clicked) {
           v_Color = vec4(1, 0, 0, 1);
@@ -37,16 +31,18 @@ const vshaderSource = `
 // 片元(像素)着色器(计算出当前绘制图中每个像素的颜色值)
 const fshaderSource = `
     precision mediump float;
+
     varying vec4 v_Color;
     uniform sampler2D u_Sampler;
-    varying vec2 v_TexCoord;
+    varying vec3 v_TexCoord;
     uniform samplerCube skybox;
-    varying vec3 v_TexCoordCube;
+    uniform int u_fragType; //0 none, 1 2d, 2 cube
+
     void main() {
-      if (v_TexCoordCube.x >= 0.0) {
-        gl_FragColor = textureCube(skybox, v_TexCoordCube);
-      } else if (v_TexCoord.x >= 0.0) {
-        gl_FragColor = texture2D(u_Sampler, v_TexCoord);
+      if (u_fragType == 1) {
+        gl_FragColor = texture2D(u_Sampler, v_TexCoord.xy);
+      } else if (u_fragType == 2) {
+        // gl_FragColor = textureCube(skybox, v_TexCoord);
       } else {
         gl_FragColor = v_Color;
       }
@@ -57,8 +53,7 @@ class GLSL {
   program: WebGLProgram | null = null;
   u_MvpMatrix: WebGLUniformLocation | null = null;
   u_ModelMatrix: WebGLUniformLocation | null = null;
-  u_hasTexCoord: WebGLUniformLocation | null = null;
-  u_hasTexCoordCube: WebGLUniformLocation | null = null;
+  u_fragType: WebGLUniformLocation | null = null;
   u_Clicked: WebGLUniformLocation | null = null;
   u_Sampler: WebGLUniformLocation | null = null;
   skybox: WebGLUniformLocation | null = null;
@@ -88,11 +83,12 @@ class GLSL {
       return -1;
     }
 
-    this.u_hasTexCoord = gl.getUniformLocation(this.program, "u_hasTexCoord");
-    this.u_hasTexCoordCube = gl.getUniformLocation(
-      this.program,
-      "u_hasTexCoordCube"
-    );
+    this.u_fragType = gl.getUniformLocation(this.program, "u_fragType");
+    // this.u_hasTexCoord = gl.getUniformLocation(this.program, "u_hasTexCoord");
+    // this.u_hasTexCoordCube = gl.getUniformLocation(
+    //   this.program,
+    //   "u_hasTexCoordCube"
+    // );
     // if (!this.u_hasTexCoord) {
     //   console.log("failed to get u_hasTexCoord ");
     //   return -1;
@@ -109,16 +105,8 @@ class GLSL {
     // 获取u_Sampler的存储位置
     this.u_Sampler = gl.getUniformLocation(this.program, "u_Sampler");
     this.skybox = gl.getUniformLocation(this.program, "skybox");
-    //  if (!u_Sampler) {
-    //    console.log("Failed to get the storage location of u_Sampler");
-    //    return false;
-    //  }
     this.a_TexCoord = gl.getAttribLocation(this.program, "a_TexCoord");
     this.a_TexCoordCube = gl.getAttribLocation(this.program, "a_TexCoordCube");
-    // if (a_TexCoord < 0) {
-    //   console.log("failed to get the storage location of a_TexCoord");
-    //   return -1;
-    // }
   }
 }
 

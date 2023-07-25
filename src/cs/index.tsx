@@ -177,6 +177,7 @@ export default function App() {
       const tick = (time: number) => {
         gl.useProgram(GLSL.program);
         renderFPS(time, fps!);
+        // gl.uniform1i(GLSL.u_fragType, 1);
         const viewMatrix = Camera.getViewMatrix();
         finalMatrix.set(viewProjMatrix)?.concat(viewMatrix);
         g_MvpMatrix.set(finalMatrix);

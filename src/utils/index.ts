@@ -12,3 +12,23 @@ export const fetchFile = (
   request.open("GET", fileName, true);
   request.send();
 };
+
+export const loadImages = async (images: string[]) => {
+  return await Promise.all(
+    images.map((src) => {
+      const img = new Image();
+
+      let _resolve: (value: HTMLImageElement) => void;
+      const p = new Promise<HTMLImageElement>(
+        (resolve) => (_resolve = resolve)
+      );
+
+      img.onload = () => {
+        _resolve(img);
+      };
+      img.src = src;
+
+      return p;
+    })
+  );
+};
