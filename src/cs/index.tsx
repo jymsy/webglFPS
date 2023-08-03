@@ -8,6 +8,7 @@ import GLSL from "./GLSL";
 import Wall from "./Wall";
 import Bullet from "./Bullet";
 import Gun from "./Gun";
+import SkyBox from "./SkyBox";
 import "./style.css";
 
 export default function App() {
@@ -132,7 +133,7 @@ export default function App() {
     });
   };
 
-  function main() {
+  async function main() {
     const fps = document.querySelector("#fps");
     const canvas = document.querySelector("#glcanvas") as HTMLCanvasElement;
     // 初始化 WebGL 上下文
@@ -155,6 +156,8 @@ export default function App() {
     const target = new Target(gl, 0.5, 0.4);
     // const bullet = new Bullet(gl);
     const gun = new Gun(gl, "gun.obj");
+    const sky = new SkyBox(gl);
+    await sky.init(gl);
 
     initEventHandlers(canvas, gl, target, gun);
 
@@ -177,7 +180,7 @@ export default function App() {
       const tick = (time: number) => {
         gl.useProgram(GLSL.program);
         renderFPS(time, fps!);
-        // gl.uniform1i(GLSL.u_fragType, 1);
+
         const viewMatrix = Camera.getViewMatrix();
         finalMatrix.set(viewProjMatrix)?.concat(viewMatrix);
         g_MvpMatrix.set(finalMatrix);
@@ -196,6 +199,7 @@ export default function App() {
         target.tick(gl);
 
         // bullet.tick(gl);
+        sky.tick(gl);
         gun.tick(gl, g_MvpMatrix);
 
         requestAnimationFrame(tick);

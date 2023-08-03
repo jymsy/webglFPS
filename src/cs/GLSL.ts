@@ -7,7 +7,6 @@ precision mediump int;
     attribute vec4 a_Color;
       uniform mat4 u_MvpMatrix;
       attribute vec2 a_TexCoord;
-      attribute vec3 a_TexCoordCube;
       uniform int u_fragType; //0 none, 1 2d, 2 cube
       uniform bool u_Clicked;
       varying vec3 v_TexCoord;
@@ -18,7 +17,7 @@ precision mediump int;
         if (u_fragType == 1) {
           v_TexCoord = vec3(a_TexCoord, 1.0);
         } else if (u_fragType == 2) {
-          v_TexCoord = a_TexCoordCube;
+          v_TexCoord = vec3(a_Position);
         }
         if (u_Clicked) {
           v_Color = vec4(1, 0, 0, 1);
@@ -42,7 +41,7 @@ const fshaderSource = `
       if (u_fragType == 1) {
         gl_FragColor = texture2D(u_Sampler, v_TexCoord.xy);
       } else if (u_fragType == 2) {
-        // gl_FragColor = textureCube(skybox, v_TexCoord);
+        gl_FragColor = textureCube(skybox, v_TexCoord);
       } else {
         gl_FragColor = v_Color;
       }

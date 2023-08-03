@@ -43,9 +43,9 @@ class Wall {
     // 连接变量与缓冲区对象
     gl.enableVertexAttribArray(GLSL.a_Position);
 
-    gl.uniform1i(GLSL.u_fragType, 0.0);
+    gl.uniform1i(GLSL.u_fragType, 0);
     if (loadTexture) {
-      gl.uniform1i(GLSL.u_fragType, 1.0);
+      gl.uniform1i(GLSL.u_fragType, 1);
 
       gl.vertexAttribPointer(
         GLSL.a_TexCoord,
