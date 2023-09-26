@@ -83,15 +83,6 @@ class GLSL {
     }
 
     this.u_fragType = gl.getUniformLocation(this.program, "u_fragType");
-    // this.u_hasTexCoord = gl.getUniformLocation(this.program, "u_hasTexCoord");
-    // this.u_hasTexCoordCube = gl.getUniformLocation(
-    //   this.program,
-    //   "u_hasTexCoordCube"
-    // );
-    // if (!this.u_hasTexCoord) {
-    //   console.log("failed to get u_hasTexCoord ");
-    //   return -1;
-    // }
 
     this.a_Color = gl.getAttribLocation(this.program, "a_Color");
     if (this.a_Color < 0) {

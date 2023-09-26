@@ -9,15 +9,12 @@ import Wall from "./Wall";
 import Bullet from "./Bullet";
 import Gun from "./Gun";
 import SkyBox from "./SkyBox";
+import Texture from "./Texture";
 import "./style.css";
 
 export default function App() {
-  const textures = {
-    wall: "../images/wall.jpg",
-    ground: "../images/ground.jpg",
-  };
+  const textures = ["../images/wall.jpg", "../images/ground.jpg"];
 
-  const images: { [key: string]: HTMLImageElement } = {};
   const g_MvpMatrix = new Matrix4();
   const frontVertex = [
     -2, 1, -2, 0, 1, -2, 0, -2, 0, 0, 2, 1, -2, 4, 1, 2, 0, -2, 4, 0,
@@ -85,54 +82,6 @@ export default function App() {
     });
   };
 
-  const loadTexture = (
-    gl: WebGLRenderingContext,
-    texture: WebGLTexture,
-    image: HTMLImageElement,
-    index: number
-  ) => {
-    // 开启纹理单元
-    gl.activeTexture(gl.TEXTURE0 + index);
-    // 向target绑定纹理对象
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    // 配置纹理参数
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    // 配置纹理图像
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-  };
-
-  const initTextures = (gl: WebGLRenderingContext) => {
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // 对纹理图像y轴反转
-    Object.keys(images).forEach((key, index) => {
-      const texture = gl.createTexture(); // 创建纹理对象
-      if (!texture) {
-        console.log("Failed to create the texture object");
-        return false;
-      }
-
-      loadTexture(gl, texture, images[key], index);
-    });
-  };
-
-  const loadTextures = (callback: () => void) => {
-    let imagesNums = Object.keys(textures).length;
-
-    const onImageLoad = () => {
-      --imagesNums;
-      // 如果所有图像都加载完成就调用回调函数
-      if (imagesNums == 0) {
-        callback();
-      }
-    };
-    Object.keys(textures).forEach((name) => {
-      const image = new Image();
-      image.src = textures[name as keyof typeof textures];
-      image.onload = onImageLoad;
-      images[name] = image;
-    });
-  };
-
   async function main() {
     const fps = document.querySelector("#fps");
     const canvas = document.querySelector("#glcanvas") as HTMLCanvasElement;
@@ -158,6 +107,7 @@ export default function App() {
     const gun = new Gun(gl, "gun.obj");
     const sky = new SkyBox(gl);
     await sky.init(gl);
+    const texture = new Texture(textures);
 
     initEventHandlers(canvas, gl, target, gun);
 
@@ -175,35 +125,35 @@ export default function App() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-    loadTextures(() => {
-      initTextures(gl);
-      const tick = (time: number) => {
-        gl.useProgram(GLSL.program);
-        renderFPS(time, fps!);
+    const tick = (time: number) => {
+      gl.useProgram(GLSL.program);
+      renderFPS(time, fps!);
 
-        const viewMatrix = Camera.getViewMatrix();
-        finalMatrix.set(viewProjMatrix)?.concat(viewMatrix);
-        g_MvpMatrix.set(finalMatrix);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.uniformMatrix4fv(GLSL.u_MvpMatrix, false, g_MvpMatrix.elements);
+      const viewMatrix = Camera.getViewMatrix();
+      finalMatrix.set(viewProjMatrix)?.concat(viewMatrix);
+      g_MvpMatrix.set(finalMatrix);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.uniformMatrix4fv(GLSL.u_MvpMatrix, false, g_MvpMatrix.elements);
 
-        // 将0号纹理传递给着色器
-        gl.uniform1i(GLSL.u_Sampler, 0);
-        frontWall.tick(gl, true);
-        leftWall.tick(gl, true);
-        rightWall.tick(gl, true);
-        backWall.tick(gl, true);
-        gl.uniform1i(GLSL.u_Sampler, 1);
-        floor.tick(gl, true);
+      // 将0号纹理传递给着色器
+      gl.uniform1i(GLSL.u_Sampler, 0);
+      frontWall.tick(gl);
+      leftWall.tick(gl);
+      rightWall.tick(gl);
+      backWall.tick(gl);
+      gl.uniform1i(GLSL.u_Sampler, 1);
+      floor.tick(gl);
 
-        target.tick(gl);
+      target.tick(gl);
 
-        // bullet.tick(gl);
-        sky.tick(gl);
-        gun.tick(gl, g_MvpMatrix);
+      // bullet.tick(gl);
+      sky.tick(gl);
+      gun.tick(gl, g_MvpMatrix);
 
-        requestAnimationFrame(tick);
-      };
+      requestAnimationFrame(tick);
+    };
+
+    texture.load(gl, () => {
       requestAnimationFrame(tick);
     });
   }

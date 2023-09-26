@@ -1,6 +1,5 @@
-import { fetchFile, loadImages } from "../utils";
+import { loadImages } from "../utils";
 import { OBJDoc, DrawingInfo } from "./OBJParse";
-import { Matrix4, Vector3 } from "../utils/cuon-matrix";
 import GLSL from "./GLSL";
 
 const vertices = new Float32Array([
